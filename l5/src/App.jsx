@@ -59,7 +59,7 @@ const SpotLightWithHelper = () => {
 
   // SpotLightHelper → shows cone of light
   // NOTE: SpotLightHelper only takes (light, color)
-  useHelper(spotlight, THREE.SpotLightHelper, "yellow");
+  useHelper(spotlight, THREE.SpotLightHelper, "orange");
 
   // Leva control for angle
  const { angle } = useControls({
@@ -174,8 +174,7 @@ function App() {
     <div style={{ height: '100vh' }}>
 
       {/* Leva Panel */}
-      <Leva position="top-left" />
-
+    <Leva  />
       <Canvas
         camera={{
           position: [3, 3, 3],
@@ -218,7 +217,7 @@ function App() {
         {/* Lights */}
         <ambientLight intensity={0.7} />
 
-        {/* <DirectionalLightWithHelper /> */}
+        <DirectionalLightWithHelper />
         <SpotLightWithHelper />
 
       </Canvas>

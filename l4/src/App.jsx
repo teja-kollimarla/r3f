@@ -58,7 +58,7 @@ function App() {
         <OrbitControls />
 
         {/* Lighting */}
-        <ambientLight intensity={0.6} color={'yellow'} />
+        <ambientLight intensity={0.} color={'yellow'} />
         {/* <directionalLight position={[2, 5, 5]} intensity={1} /> */}
       </Canvas>
     </div>

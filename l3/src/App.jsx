@@ -14,7 +14,12 @@ const boxref=useRef()
  }) 
  return(
 <mesh ref={boxref} >
-          <FirstPersonControls/>
+          <FirstPersonControls movementSpeed={2} a/>
+          {/* 
+            movementSpeed for the zoom in and out speed
+            autoForward  for zoom in fully auto 
+          
+          */}
           <boxGeometry args={[1,1,1]}/>
           {/* <meshBasicMaterial wireframe color={'red'}/>  don't need light  */}
           <meshStandardMaterial  color={'red'}/>           {/* need light source */}

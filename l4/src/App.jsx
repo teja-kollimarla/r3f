@@ -15,7 +15,7 @@ function AnimateBox() {
       max: 1,
       step: 0.001,
     },
-    button:false  });
+    wireframe:false  });
 
   useFrame(() => {
     if (boxref.current) {
@@ -38,7 +38,7 @@ function App() {
   return (
     <div className="canvas-div" style={{ height: '100vh' }}>
       
-        <Leva position='topleft'/>
+        <Leva position='top-left' neverHide/>
       <Canvas>
         <GizmoHelper alignment='top-left'>
           <GizmoViewport/>
@@ -58,8 +58,8 @@ function App() {
         <OrbitControls />
 
         {/* Lighting */}
-        <ambientLight intensity={0.3} />
-        <directionalLight position={[2, 5, 5]} intensity={1} />
+        <ambientLight intensity={0.6} color={'yellow'} />
+        {/* <directionalLight position={[2, 5, 5]} intensity={1} /> */}
       </Canvas>
     </div>
   );

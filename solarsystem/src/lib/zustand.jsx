@@ -1,8 +1,23 @@
 import { create } from "zustand";
 
 const useSelected = create((set) => ({
-  selected: null,
-  setSelected: (name,ref) => set({ selected: name,ref:ref }),
+  // 🔹 current selected object
+  selected: null,          // "Sun"
+  selectedRef: null,       // ref to mesh (optional for future)
+
+  // 🔹 set selected object
+  setSelected: (name, ref = null) =>
+    set({
+      selected: name,
+      selectedRef: ref,
+    }),
+
+  // 🔹 clear selection
+  clearSelected: () =>
+    set({
+      selected: null,
+      selectedRef: null,
+    }),
 }));
 
 export default useSelected;

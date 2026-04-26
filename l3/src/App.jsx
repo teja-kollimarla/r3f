@@ -2,6 +2,7 @@ import {Canvas,useFrame} from '@react-three/fiber';
 import { useRef } from 'react';
 import { BoxGeometry } from 'three/src/Three.Core.js';
 import { FirstPersonControls } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 
 function AnimateBox(){
 const boxref=useRef()
@@ -15,6 +16,7 @@ const boxref=useRef()
  return(
 <mesh ref={boxref} >
           <FirstPersonControls movementSpeed={2} a/>
+          <OrbitControls/>
           {/* 
             movementSpeed for the zoom in and out speed
             autoForward  for zoom in fully auto 

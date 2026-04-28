@@ -14,14 +14,14 @@ export default function Sun({children}) {
 
   const {
     speed = 0.1,
-    size = 1,
+    size = 3,
     color = "orange",
     rotateX,
     rotateY,
     rotateZ,
   } = useLeva("Sun", {
-    speed: { value: 0.01, min: 0, max: 10, step: 0.001 },
-    size: { value: 7, min: 1, max: 10, step: 0.1 },
+    speed: { value: 1, min: 0, max: 10, step: 0.001 },
+    size: { value: 3, min: 1, max: 10, step: 0.1 },
     color: "orange",
     rotateX: false,
     rotateY: true,
@@ -33,8 +33,7 @@ export default function Sun({children}) {
   return (
     <group>
     <mesh
-      ref={sun}
-      scale={size}
+      ref={sun} 
       position={[0,0,0]}
       onPointerDown={(e) => {
         e.stopPropagation();
@@ -42,7 +41,7 @@ export default function Sun({children}) {
         setSelected("Sun", e.object);
       }}
     >
-      <sphereGeometry args={[10, 32, 32]} />
+      <sphereGeometry args={[size, 32, 32]} />
       <meshBasicMaterial map={texture} color={color} />
     </mesh>
     {children}

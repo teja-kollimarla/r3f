@@ -19,7 +19,8 @@ function App() {
 
   return (
     <div style={{ height: "100vh", position: "relative" }}>
-      <div className="leva-wrapper">
+      <div className="leva-wrapper" onPointerDown={(e) => e.stopPropagation()}
+  onClick={(e) => e.stopPropagation()}>
         {selected && <Leva
           theme={{
             sizes: {
@@ -37,6 +38,7 @@ function App() {
     console.log("MISSED");
     clearSelected();
   }}
+  onClick={(e) => e.stopPropagation()}
       >
         <fog attach="fog" args={['white', 100, 2700]} />
         <Suspense fallback={null}>
@@ -45,9 +47,8 @@ function App() {
         <OrbitControls maxDistance={500} minDistance={1} rotateSpeed={0.5} />
         <gridHelper args={[600, 50]} raycast={() => null} />
         <axesHelper args={[500]} raycast={() => null} />
-        {/* <SolarSystem/> */}
-        <Sun/>
-        <Mercury/>
+        <SolarSystem/>
+        
       </Canvas>
     </div>
   );

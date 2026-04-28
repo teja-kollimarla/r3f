@@ -7,6 +7,8 @@ import { Leva } from "leva";
 import SpaceSphere from "./components/backgroundd";
 import useSelected from "./lib/zustand";
 import { Fog } from "three";
+import Mercury from "./components/mercury";
+import { SolarSystem } from "./components/solarSystem";
 
 function App() {
   const { clearSelected,selected } = useSelected();
@@ -43,7 +45,9 @@ function App() {
         <OrbitControls maxDistance={500} minDistance={1} rotateSpeed={0.5} />
         <gridHelper args={[600, 50]} raycast={() => null} />
         <axesHelper args={[500]} raycast={() => null} />
-        <Sun />
+        {/* <SolarSystem/> */}
+        <Sun/>
+        <Mercury/>
       </Canvas>
     </div>
   );

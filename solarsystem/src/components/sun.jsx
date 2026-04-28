@@ -6,25 +6,22 @@ import useLeva from "../lib/leva";
 import useSelected from "../lib/zustand";
 
 
-export default function Sun() {
+export default function Sun({children}) {
   const sun = useRef();
   const texture = useLoader(TextureLoader, "/sun.jpg");
 
-  const { selected, setSelected } = useSelected((s) => ({
-    selected: s.selected,
-    setSelected: s.setSelected,
-  }));
+  const setSelected = useSelected((s) => s.setSelected);
 
   const {
-    speed = 0.01,
+    speed = 0.1,
     size = 1,
     color = "orange",
     rotateX,
     rotateY,
     rotateZ,
   } = useLeva("Sun", {
-    speed: { value: 0.01, min: 0, max: 0.1, step: 0.001 },
-    size: { value: 1, min: 0.1, max: 10, step: 0.1 },
+    speed: { value: 0.01, min: 0, max: 10, step: 0.001 },
+    size: { value: 7, min: 1, max: 10, step: 0.1 },
     color: "orange",
     rotateX: false,
     rotateY: true,
@@ -34,18 +31,21 @@ export default function Sun() {
   useRotate(sun, speed, rotateX, rotateY, rotateZ);
 
   return (
+    <group>
     <mesh
       ref={sun}
       scale={size}
+      position={[0,0,0]}
       onPointerDown={(e) => {
-        e.stopPropagation();         // ✅ prevent bubbling
-        clickedRef.current = true;   // ✅ mark object click
-        setSelected("Sun", e.object); // ✅ store actual mesh
-        console.log("Sun clicked");
+        e.stopPropagation();
+        console.log("setting sun")
+        setSelected("Sun", e.object);
       }}
     >
       <sphereGeometry args={[10, 32, 32]} />
       <meshBasicMaterial map={texture} color={color} />
     </mesh>
+    {children}
+  </group>
   );
 }

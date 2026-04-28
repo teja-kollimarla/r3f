@@ -1,6 +1,6 @@
 import { useFrame } from "@react-three/fiber";
 
-const Rotate=(ref,speed=0.01,isx,isy,isz)=>{
+const useRotate=(ref,speed=0.01,isx,isy,isz)=>{
     useFrame(()=>{
         if(ref.current){
             if(isx){
@@ -12,4 +12,4 @@ const Rotate=(ref,speed=0.01,isx,isy,isz)=>{
 }
 
 
-export default Rotate;
+export default useRotate;

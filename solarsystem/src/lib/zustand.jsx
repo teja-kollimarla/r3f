@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 const useSelected = create((set) => ({
   // 🔹 current selected object
-  selected: null,          // "Sun"
+  selected: null,          
   selectedRef: null,       // ref to mesh (optional for future)
 
   // 🔹 set selected object
@@ -14,10 +14,13 @@ const useSelected = create((set) => ({
 
   // 🔹 clear selection
   clearSelected: () =>
-    set({
+  set((state) => {
+    console.log("Clearing selection", state.selected);
+    return {
       selected: null,
       selectedRef: null,
-    }),
+    };
+  }),
 }));
 
 export default useSelected;

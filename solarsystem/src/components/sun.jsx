@@ -5,10 +5,15 @@ import useRotate from "../lib/rotate";
 import useLeva from "../lib/leva";
 import useSelected from "../lib/zustand";
 
+
 export default function Sun() {
   const sun = useRef();
   const texture = useLoader(TextureLoader, "/sun.jpg");
-  const { setSelected } = useSelected();
+
+  const { selected, setSelected } = useSelected((s) => ({
+    selected: s.selected,
+    setSelected: s.setSelected,
+  }));
 
   const {
     speed = 0.01,
@@ -33,8 +38,9 @@ export default function Sun() {
       ref={sun}
       scale={size}
       onPointerDown={(e) => {
-        e.stopPropagation();
-        setSelected("Sun",sun);
+        e.stopPropagation();         // ✅ prevent bubbling
+        clickedRef.current = true;   // ✅ mark object click
+        setSelected("Sun", e.object); // ✅ store actual mesh
         console.log("Sun clicked");
       }}
     >

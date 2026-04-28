@@ -8,3 +8,17 @@
   padding: 0;
   margin: 0;
 }
+
+.leva-c-kWgxhW {
+  height: auto !important;
+  max-height: 80vh !important;
+}
+
+.leva-wrapper {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 300px;
+  max-height: 80vh;
+  overflow-y: auto;
+}

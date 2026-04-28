@@ -11,9 +11,13 @@ const useLeva = (name, config) => {
   const selected = useSelected((state) => state.selected);
   const mergedConfig = { ...defaultConfig, ...config };
 
-  const values = useControls(name, mergedConfig, {
-    hidden: selected !== name,  // ✅ hide when not selected
-  });
+  const values = useControls(
+    name,
+    mergedConfig,
+    {
+      hidden: selected !== name, // ✅ safe
+    }
+  );
 
   return values;
 };

@@ -5,7 +5,7 @@ function SpaceSphere() {
   const texture = useLoader(TextureLoader, '/space.jpg'); // ✅ simple loader, works with any jpg
 
   return (
-    <mesh>
+    <mesh raycast={() => null}>
       <sphereGeometry args={[500, 60, 40]} />
       <meshBasicMaterial
         map={texture}
@@ -15,4 +15,4 @@ function SpaceSphere() {
   );
 }
 
-export default SpaceSphere
+export default SpaceSphere;

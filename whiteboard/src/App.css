@@ -1,0 +1,13 @@
+.inside-canvas{
+    background:black;
+    color:white;
+    width:fit-content;
+    height:fit-content ;
+    padding:1rem;
+    border-radius:10rem
+}
+
+canvas {
+  display: block;
+  max-width: 100%;
+}

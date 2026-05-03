@@ -1,13 +1,15 @@
-.inside-canvas{
-    background:black;
-    color:white;
-    width:fit-content;
-    height:fit-content ;
-    padding:1rem;
-    border-radius:10rem
-}
-
 canvas {
   display: block;
-  max-width: 100%;
+}
+
+.icon-wrapper {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.icon-wrapper svg {
+  width: 24px !important;
+  height: 24px !important;
+  display: block;
 }

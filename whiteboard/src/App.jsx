@@ -1,46 +1,64 @@
-import { OrbitControls, Html } from '@react-three/drei'
+import { useState } from 'react'
+import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import './App.css'
 import { geometries } from './lib/geometrics'
+import Shape from './components/geomentrics'
 
 function App() {
+  const [selectedGeometry, setSelectedGeometry] = useState(null)
+
   return (
-    <div className="w-screen h-screen bg-gray-300 flex items-center justify-center">
+    <div className="w-full h-screen bg-gray-300 flex items-center justify-center">
       <div className="w-[90%] h-[90%] bg-white rounded-xl shadow-xl flex overflow-hidden">
 
-        <div className="flex-[0_0_30%] bg-green-200 border-r border-black p-4 overflow-y-auto">
-          <div className="flex flex-col gap-2">
-  {Object.entries(geometries).map(([key, item]) => {
-    const Icon = item.icon
-    return (
-      <div className="w-10 h-10 flex items-center justify-center overflow-hidden">
-  <Icon size={22} />
-</div>
-    )
-  })}
-</div>
+        
+        <div className="flex-[0_0_25%] min-w-[200px] max-w-[250px] border-r border-gray-300 p-3 overflow-y-auto overflow-x-hidden">
+          <p className="text-xs font-semibold text-gray-400 uppercase mb-2 tracking-wide">Geometries</p>
+          <div className="grid grid-cols-3 gap-2 w-full">
+            {Object.entries(geometries).map(([key, item]) => {
+              const Icon = item.icon
+              const isSelected = selectedGeometry === key
+              return (
+                <div
+                  key={key}
+                  onClick={() => setSelectedGeometry(key)}
+                  className={`flex flex-col items-center justify-start gap-1 p-2 rounded cursor-pointer transition-colors
+                    ${isSelected ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                >
+                  <div className="icon-wrapper">
+                    <Icon />
+                  </div>
+                  <span className="text-[10px] text-center w-full truncate leading-tight">{item.name}</span>
+                </div>
+              )
+            })}
+          </div>
         </div>
 
-        <div className="flex-[0_0_70%] relative overflow-hidden">
+        
+        <div className="flex-1 relative overflow-hidden">
           <Canvas
-            className="w-full h-full"
             camera={{
-              position: [100, 50, -5],
+              position: [5, 3, 5],
               fov: 45,
               near: 0.1,
               far: 10000
             }}
           >
-            <OrbitControls minDistance={10} maxDistance={1000} />
-            <axesHelper args={[1000]} />
-            <gridHelper args={[1000, 100, 'red', 'blue']} />
-
-            <Html position={[100, 0, -5]}>
-              <div className="bg-black text-white px-4 py-2 rounded-full">
-                inside canvas
-              </div>
-            </Html>
+            <ambientLight intensity={0.5} />
+            <directionalLight position={[10, 10, 5]} intensity={1} />
+            <OrbitControls minDistance={2} maxDistance={100} />
+            <axesHelper args={[5]} />
+            <gridHelper args={[20, 20, 'red', 'blue']} />
+            {selectedGeometry && <Shape type={selectedGeometry} />}
           </Canvas>
+
+          {!selectedGeometry && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <p className="text-gray-400 text-sm">Select a geometry from the panel</p>
+            </div>
+          )}
         </div>
 
       </div>

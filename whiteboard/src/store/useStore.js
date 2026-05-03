@@ -17,7 +17,7 @@ const defaultLights = {
     intensity: 0.5,
   },
   directional: {
-    enabled: true,
+    enabled: false,
     color: '#ffffff',
     intensity: 1,
     x: 10, y: 10, z: 5,
@@ -58,10 +58,11 @@ const defaultLights = {
 const useStore = create((set) => ({
   selectedGeometry: null,
   transformMode: 'translate',
+  showTransform: false,          // ← ADD THIS
   geoArgs: [],
   objectProps: defaultObjectProps,
   lights: defaultLights,
-  backgroundColor: '#d1d5db', // default gray-300
+  backgroundColor: '#d1d5db',
 
   selectGeometry: (key) => set({
     selectedGeometry: key,
@@ -69,7 +70,8 @@ const useStore = create((set) => ({
     objectProps: defaultObjectProps,
   }),
 
-  setTransformMode: (mode) => set({ transformMode: mode }),
+  setTransformMode:  (mode) => set({ transformMode: mode }),
+  setShowTransform:  (v)    => set({ showTransform: v }), // ← ADD THIS
 
   setObjectProp: (key, value) => set((state) => ({
     objectProps: { ...state.objectProps, [key]: value },
@@ -93,8 +95,7 @@ const useStore = create((set) => ({
     },
   })),
 
-  resetLights: () => set({ lights: defaultLights }),
-
+  resetLights:        () => set({ lights: defaultLights }),
   setBackgroundColor: (color) => set({ backgroundColor: color }),
 }))
 

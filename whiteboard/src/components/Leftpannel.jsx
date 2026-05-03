@@ -2,19 +2,22 @@ import useStore from '../store/useStore'
 import { geometries } from '../lib/geometrics'
 import Section from './ui/selection'
 import LightingPanel from './LightingPannel'
+import Toggle from './ui/toggle'
 
 function LeftPanel() {
   const selectedGeometry   = useStore((s) => s.selectedGeometry)
   const transformMode      = useStore((s) => s.transformMode)
+  const showTransform      = useStore((s) => s.showTransform)
   const selectGeometry     = useStore((s) => s.selectGeometry)
   const setTransformMode   = useStore((s) => s.setTransformMode)
+  const setShowTransform   = useStore((s) => s.setShowTransform)
   const backgroundColor    = useStore((s) => s.backgroundColor)
   const setBackgroundColor = useStore((s) => s.setBackgroundColor)
 
   return (
     <div className="flex-[0_0_180px] border-r border-gray-200 p-3 overflow-y-auto overflow-x-hidden flex flex-col gap-4">
 
-      {/* ── Scene Background ───────────────────── */}
+      {/* ── Scene ──────────────────────────────── */}
       <Section title="Scene">
         <div className="flex items-center gap-2">
           <input
@@ -30,6 +33,11 @@ function LeftPanel() {
 
       {/* ── Transform ──────────────────────────── */}
       <Section title="Transform">
+        <Toggle
+          label={`Gizmo ${showTransform ? 'On' : 'Off'}`}
+          value={showTransform}
+          onChange={setShowTransform}
+        />
         <div className="flex flex-col gap-1">
           {[
             { key: 'translate', label: '↔ Move'  },
@@ -38,11 +46,13 @@ function LeftPanel() {
           ].map((m) => (
             <button
               key={m.key}
-              onClick={() => setTransformMode(m.key)}
+              onClick={() => showTransform && setTransformMode(m.key)}
               className={`text-xs py-1.5 px-2 rounded font-medium transition-colors text-left
-                ${transformMode === m.key
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                ${!showTransform
+                  ? 'bg-gray-50 text-gray-300 cursor-not-allowed'
+                  : transformMode === m.key
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
             >
               {m.label}
             </button>

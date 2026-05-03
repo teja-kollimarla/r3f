@@ -11,6 +11,7 @@ function Shape() {
 
   const selectedGeometry = useStore((s) => s.selectedGeometry)
   const transformMode    = useStore((s) => s.transformMode)
+  const showTransform    = useStore((s) => s.showTransform)
   const geoArgs          = useStore((s) => s.geoArgs)
   const { color, scale, wireframe, rotation } = useStore((s) => s.objectProps)
 
@@ -32,7 +33,7 @@ function Shape() {
 
   return (
     <>
-      {ready && <TransformControls object={meshRef} mode={transformMode} />}
+      {ready && <TransformControls enabled={showTransform} object={meshRef} mode={transformMode} />}
       <mesh
         ref={(el) => {
           meshRef.current = el

@@ -5,11 +5,16 @@ import useStore from './store/useStore'
 import LeftPanel from './components/Leftpannel'
 import RightPanel from './components/RightPannel'
 import SceneLights from './components/SceneLighting'
-import Shape from './components/Shape'
+import Scene from './components/Scene'
+
+function SceneBackground() {
+  const backgroundColor = useStore((s) => s.backgroundColor)
+  return <color attach="background" args={[backgroundColor]} />
+}
 
 function App() {
-  const selectedGeometry = useStore((s) => s.selectedGeometry)
-  const geoArgs          = useStore((s) => s.geoArgs)
+  const objects   = useStore((s) => s.objects)
+  const selectedId = useStore((s) => s.selectedId)
 
   return (
     <div className="w-full h-screen bg-gray-300 flex items-center justify-center">
@@ -24,25 +29,20 @@ function App() {
             <OrbitControls makeDefault />
             <axesHelper args={[5]} />
             <gridHelper args={[20, 20, 'red', 'blue']} />
-            {selectedGeometry && geoArgs.length > 0 && <Shape />}
+            <Scene />
           </Canvas>
 
-          {!selectedGeometry && (
+          {objects.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <p className="text-gray-400 text-sm">Select a geometry from the panel</p>
+              <p className="text-gray-400 text-sm">Add a geometry from the panel</p>
             </div>
           )}
         </div>
 
-        {selectedGeometry && <RightPanel />}
+        {selectedId && <RightPanel />}
       </div>
     </div>
   )
-}
-
-function SceneBackground() {
-  const backgroundColor = useStore((s) => s.backgroundColor)
-  return <color attach="background" args={[backgroundColor]} />
 }
 
 export default App

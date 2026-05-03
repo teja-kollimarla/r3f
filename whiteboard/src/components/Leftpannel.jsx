@@ -5,10 +5,13 @@ import LightingPanel from './LightingPannel'
 import Toggle from './ui/toggle'
 
 function LeftPanel() {
-  const selectedGeometry   = useStore((s) => s.selectedGeometry)
+  const objects            = useStore((s) => s.objects)
+  const selectedId         = useStore((s) => s.selectedId)
+  const addObject          = useStore((s) => s.addObject)
+  const removeObject       = useStore((s) => s.removeObject)
+  const selectObject       = useStore((s) => s.selectObject)
   const transformMode      = useStore((s) => s.transformMode)
   const showTransform      = useStore((s) => s.showTransform)
-  const selectGeometry     = useStore((s) => s.selectGeometry)
   const setTransformMode   = useStore((s) => s.setTransformMode)
   const setShowTransform   = useStore((s) => s.setShowTransform)
   const backgroundColor    = useStore((s) => s.backgroundColor)
@@ -62,18 +65,15 @@ function LeftPanel() {
 
       {/* ── Geometries ─────────────────────────── */}
       <Section title="Geometries">
+        <p className="text-[9px] text-gray-400">Click to add to scene</p>
         <div className="grid grid-cols-3 gap-1.5 w-full">
           {Object.entries(geometries).map(([key, item]) => {
             const Icon = item.icon
-            const isSelected = selectedGeometry === key
             return (
               <div
                 key={key}
-                onClick={() => selectGeometry(key)}
-                className={`flex flex-col items-center justify-start gap-1 p-1.5 rounded cursor-pointer transition-colors
-                  ${isSelected
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                onClick={() => addObject(key)}
+                className="flex flex-col items-center justify-start gap-1 p-1.5 rounded cursor-pointer transition-colors bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-600 active:scale-95"
               >
                 <div className="icon-wrapper"><Icon /></div>
                 <span className="text-[9px] text-center w-full truncate leading-tight">{item.name}</span>
@@ -82,6 +82,34 @@ function LeftPanel() {
           })}
         </div>
       </Section>
+
+      {/* ── Objects in Scene ───────────────────── */}
+      {objects.length > 0 && (
+        <Section title="Objects">
+          <div className="flex flex-col gap-1">
+            {objects.map((obj) => {
+              const isSelected = obj.id === selectedId
+              return (
+                <div
+                  key={obj.id}
+                  className={`flex items-center justify-between px-2 py-1.5 rounded cursor-pointer text-xs font-medium transition-colors
+                    ${isSelected ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                  onClick={() => selectObject(obj.id)}
+                >
+                  <span className="capitalize truncate">{geometries[obj.geometryKey]?.name} #{obj.id}</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); removeObject(obj.id) }}
+                    className={`ml-1 text-[10px] font-bold transition-colors
+                      ${isSelected ? 'text-white hover:text-red-200' : 'text-gray-400 hover:text-red-500'}`}
+                  >
+                    ✕
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </Section>
+      )}
 
       <LightingPanel />
 

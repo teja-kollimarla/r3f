@@ -10,7 +10,7 @@ function App() {
         <mesh>
           <boxGeometry args={[1,1,3]}/>
           {/* <meshBasicMaterial wireframe color={'red'}/>  don't need light  */}
-          <meshPhongMaterial wireframe color={'red'}/>           {/* need light source */}
+          <meshPhongMaterial wireframe={false} color={'black'}/>           {/* need light source */}
           
         </mesh>
         <directionalLight position={[0,10,110]}/>

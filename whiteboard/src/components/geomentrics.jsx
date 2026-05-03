@@ -1,5 +1,6 @@
+import { useRef } from 'react'
+import { TransformControls } from '@react-three/drei'
 import { geometries } from '../lib/geometrics'
-// import { meshStandardMaterial } from 'three'
 
 const defaultArgs = {
   box: [1, 1, 1],
@@ -16,17 +17,20 @@ const defaultArgs = {
   tetrahedron: [1, 0],
 }
 
-function Shape({ type }) {
+function Shape({ type, mode }) {
+  const meshRef = useRef()
   const item = geometries[type]
   if (!item) return null
 
   const Geometry = item.geometry
 
   return (
-    <mesh>
-      <Geometry args={defaultArgs[type] || [1, 1, 1]} />
-      <meshStandardMaterial color="orange" />
-    </mesh>
+    <TransformControls object={meshRef} mode={mode}>
+      <mesh ref={meshRef}>
+        <Geometry args={defaultArgs[type] || [1, 1, 1]} />
+        <meshStandardMaterial color="orange" />
+      </mesh>
+    </TransformControls>
   )
 }
 

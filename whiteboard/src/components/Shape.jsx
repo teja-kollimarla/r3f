@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { TransformControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
+import { useMemo } from 'react'
 import { geometries } from '../lib/geometrics'
 import useStore from '../store/useStore'
 
@@ -14,8 +15,11 @@ function Shape() {
   const { color, scale, wireframe, rotation } = useStore((s) => s.objectProps)
 
   const item = geometries[selectedGeometry]
-  if (!item) return null
-  const Geometry = item.geometry
+
+  const geometry = useMemo(() => {
+    if (!item) return null
+    return new item.geometry(...geoArgs)
+  }, [selectedGeometry, geoArgs])
 
   useFrame((_, delta) => {
     if (!meshRef.current || !rotation.enabled) return
@@ -23,6 +27,8 @@ function Shape() {
     if (rotation.y) meshRef.current.rotation.y += rotation.speed * delta
     if (rotation.z) meshRef.current.rotation.z += rotation.speed * delta
   })
+
+  if (!item || !geometry) return null
 
   return (
     <>
@@ -34,11 +40,8 @@ function Shape() {
         }}
         scale={[scale, scale, scale]}
       >
-        <Geometry args={geoArgs} />
-        <meshStandardMaterial
-          color={color}
-          wireframe={wireframe}
-        />
+        <primitive object={geometry} attach="geometry" />
+        <meshStandardMaterial color={color} wireframe={wireframe} />
       </mesh>
     </>
   )

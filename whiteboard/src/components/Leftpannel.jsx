@@ -1,8 +1,118 @@
+import { useState } from 'react'
 import useStore from '../store/useStore'
 import { geometries } from '../lib/geometrics'
 import Section from './ui/selection'
 import LightingPanel from './LightingPannel'
 import Toggle from './ui/toggle'
+
+function LabelsPanel() {
+  const objects         = useStore((s) => s.objects)
+  const labels          = useStore((s) => s.labels)
+  const selectedLabelId = useStore((s) => s.selectedLabelId)
+  const addLabel        = useStore((s) => s.addLabel)
+  const removeLabel     = useStore((s) => s.removeLabel)
+  const updateLabel     = useStore((s) => s.updateLabel)
+  const selectLabel     = useStore((s) => s.selectLabel)
+
+  const [targetId, setTargetId] = useState('')
+
+  const handleAdd = () => {
+    const tid = targetId !== '' ? parseInt(targetId) : null
+    addLabel(tid)
+    setTargetId('')
+  }
+
+  return (
+    <Section title="Labels">
+      <div className="flex flex-col gap-1.5">
+        <select
+          value={targetId}
+          onChange={(e) => setTargetId(e.target.value)}
+          className="text-[10px] text-gray-600 bg-gray-100 rounded px-1.5 py-1 border border-gray-200 w-full"
+        >
+          <option value="">No target (free)</option>
+          {objects.map((o) => (
+            <option key={o.id} value={o.id}>{o.name}</option>
+          ))}
+        </select>
+        <button
+          onClick={handleAdd}
+          className="text-[10px] bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded font-medium transition-colors"
+        >
+          + Add Label
+        </button>
+      </div>
+
+      {labels.length > 0 && (
+        <div className="flex flex-col gap-1 mt-1">
+          {labels.map((label) => {
+            const isSelected = label.id === selectedLabelId
+            return (
+              <div
+                key={label.id}
+                onClick={() => selectLabel(label.id)}
+                className={`flex flex-col gap-1 p-1.5 rounded cursor-pointer border transition-colors
+                  ${isSelected ? 'border-blue-400 bg-blue-50' : 'border-gray-100 bg-gray-50 hover:border-gray-300'}`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-medium text-gray-600 truncate">{label.text}</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); removeLabel(label.id) }}
+                    className="text-[9px] text-gray-400 hover:text-red-500 font-bold ml-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {isSelected && (
+                  <div className="flex flex-col gap-1 mt-0.5">
+                    <input
+                      type="text"
+                      value={label.text}
+                      onChange={(e) => updateLabel(label.id, 'text', e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      placeholder="Label text"
+                      className="text-[10px] border border-gray-200 rounded px-1.5 py-0.5 w-full bg-white outline-none focus:border-blue-400"
+                    />
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] text-gray-400 w-10">BG</span>
+                      <input type="color" value={label.bgColor}
+                        onChange={(e) => updateLabel(label.id, 'bgColor', e.target.value)}
+                        className="w-6 h-5 rounded cursor-pointer border border-gray-200" />
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] text-gray-400 w-10">Text</span>
+                      <input type="color" value={label.textColor}
+                        onChange={(e) => updateLabel(label.id, 'textColor', e.target.value)}
+                        className="w-6 h-5 rounded cursor-pointer border border-gray-200" />
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] text-gray-400 w-10">Line</span>
+                      <input type="color" value={label.lineColor}
+                        onChange={(e) => updateLabel(label.id, 'lineColor', e.target.value)}
+                        className="w-6 h-5 rounded cursor-pointer border border-gray-200" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] text-gray-400">Font size</span>
+                      <span className="text-[9px] text-blue-500 font-mono">{label.fontSize}px</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={8} max={32} step={1}
+                      value={label.fontSize}
+                      onChange={(e) => updateLabel(label.id, 'fontSize', parseInt(e.target.value))}
+                      className="w-full accent-blue-500 h-1"
+                    />
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </Section>
+  )
+}
 
 function LeftPanel() {
   const objects            = useStore((s) => s.objects)
@@ -88,15 +198,14 @@ function LeftPanel() {
               return (
                 <div
                   key={obj.id}
-                  onClick={() => selectObject(obj.id)}
                   className={`flex items-center justify-between px-2 py-1.5 rounded cursor-pointer text-xs font-medium transition-colors
                     ${isSelected ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                  onClick={() => selectObject(obj.id)}
                 >
-                  <span className="truncate">{obj.name}</span>
+                  <span className="capitalize truncate">{obj.name}</span>
                   <button
                     onClick={(e) => { e.stopPropagation(); removeObject(obj.id) }}
-                    className={`ml-1 text-[10px] font-bold transition-colors flex-shrink-0
-                      ${isSelected ? 'text-white hover:text-red-200' : 'text-gray-400 hover:text-red-500'}`}
+                    className="ml-1 w-4 h-4 flex items-center justify-center rounded-full text-[9px] font-bold transition-colors bg-white/20 hover:bg-red-500 text-white"
                   >
                     ✕
                   </button>
@@ -106,6 +215,8 @@ function LeftPanel() {
           </div>
         </Section>
       )}
+
+      <LabelsPanel />
 
       <LightingPanel />
 

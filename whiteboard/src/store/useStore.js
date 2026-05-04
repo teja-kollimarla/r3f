@@ -1,8 +1,6 @@
 import { create } from 'zustand'
 import { geoConfigs } from '../lib/geoConfigs'
 
-const defaultRotation = { enabled: false, x: false, y: true, z: false, speed: 1 }
-
 const makeObjectProps = () => ({
   color: '#ff6600',
   scale: 1,
@@ -24,6 +22,7 @@ const defaultLights = {
 
 const typeCounts = {}
 let nextId = 1
+let nextLabelId = 1
 
 const useStore = create((set) => ({
   objects:    [],
@@ -90,6 +89,37 @@ const useStore = create((set) => ({
 
   backgroundColor:    '#d1d5db',
   setBackgroundColor: (color) => set({ backgroundColor: color }),
+
+  labels: [],
+  selectedLabelId: null,
+
+  addLabel: (targetId) => {
+    const id = nextLabelId++
+    set((state) => ({
+      labels: [...state.labels, {
+        id,
+        text:           'Label',
+        targetId:       targetId ?? null,
+        position:       [2, 2, 0],
+        lineColor:      '#ffffff',
+        bgColor:        '#1e293b',
+        textColor:      '#ffffff',
+        fontSize:       12,
+      }],
+      selectedLabelId: id,
+    }))
+  },
+
+  removeLabel: (id) => set((state) => ({
+    labels:          state.labels.filter((l) => l.id !== id),
+    selectedLabelId: state.selectedLabelId === id ? null : state.selectedLabelId,
+  })),
+
+  updateLabel: (id, key, value) => set((state) => ({
+    labels: state.labels.map((l) => l.id === id ? { ...l, [key]: value } : l),
+  })),
+
+  selectLabel: (id) => set({ selectedLabelId: id }),
 }))
 
 export default useStore

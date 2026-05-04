@@ -8,7 +8,10 @@ const makeObjectProps = () => ({
   scale: 1,
   wireframe: false,
   opacity: 1,
-  rotation: { ...defaultRotation },
+  doubleSide: false,
+  meshRotation: { x: 0, y: 0, z: 0 },
+  rotation: { enabled: false, x: false, y: true, z: false, speed: 1 },
+  revolve: { enabled: false, speed: 1, radiusX: 3, radiusZ: 3, y: 0 },
 })
 
 const defaultLights = {

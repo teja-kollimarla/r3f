@@ -3,10 +3,11 @@ import { geoConfigs } from '../lib/geoConfigs'
 
 const defaultRotation = { enabled: false, x: false, y: true, z: false, speed: 1 }
 
-export const makeObjectProps = () => ({
+const makeObjectProps = () => ({
   color: '#ff6600',
   scale: 1,
   wireframe: false,
+  opacity: 1,
   rotation: { ...defaultRotation },
 })
 
@@ -18,18 +19,20 @@ const defaultLights = {
   hemisphere:  { enabled: false, skyColor: '#ffffff', groundColor: '#444444', intensity: 0.5, showHelper: false, helperSize: 1 },
 }
 
+const typeCounts = {}
 let nextId = 1
 
-const useStore = create((set, get) => ({
-  // ── Objects ────────────────────────────────────
-  objects: [],        // [{ id, geometryKey, geoArgs, objectProps }]
+const useStore = create((set) => ({
+  objects:    [],
   selectedId: null,
 
   addObject: (geometryKey) => {
     const id = nextId++
+    typeCounts[geometryKey] = (typeCounts[geometryKey] || 0) + 1
+    const defaultName = `${geometryKey.charAt(0).toUpperCase() + geometryKey.slice(1)} ${typeCounts[geometryKey]}`
     const geoArgs = [...(geoConfigs[geometryKey]?.defaults || [])]
     set((state) => ({
-      objects: [...state.objects, { id, geometryKey, geoArgs, objectProps: makeObjectProps() }],
+      objects: [...state.objects, { id, geometryKey, name: defaultName, geoArgs, objectProps: makeObjectProps() }],
       selectedId: id,
     }))
   },
@@ -41,6 +44,10 @@ const useStore = create((set, get) => ({
       : state.selectedId
     return { objects, selectedId }
   }),
+
+  renameObject: (id, name) => set((state) => ({
+    objects: state.objects.map((o) => o.id === id ? { ...o, name } : o),
+  })),
 
   selectObject: (id) => set({ selectedId: id }),
 
@@ -67,21 +74,18 @@ const useStore = create((set, get) => ({
     ),
   })),
 
-  // ── Transform ──────────────────────────────────
-  transformMode: 'translate',
-  showTransform: false,
-  setTransformMode:  (mode) => set({ transformMode: mode }),
-  setShowTransform:  (v)    => set({ showTransform: v }),
+  transformMode:    'translate',
+  showTransform:    false,
+  setTransformMode: (mode) => set({ transformMode: mode }),
+  setShowTransform: (v)    => set({ showTransform: v }),
 
-  // ── Lights ─────────────────────────────────────
-  lights: defaultLights,
+  lights:      defaultLights,
   updateLight: (type, key, value) => set((state) => ({
     lights: { ...state.lights, [type]: { ...state.lights[type], [key]: value } },
   })),
   resetLights: () => set({ lights: defaultLights }),
 
-  // ── Scene ──────────────────────────────────────
-  backgroundColor: '#d1d5db',
+  backgroundColor:    '#d1d5db',
   setBackgroundColor: (color) => set({ backgroundColor: color }),
 }))
 

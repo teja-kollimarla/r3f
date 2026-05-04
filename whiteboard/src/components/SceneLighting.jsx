@@ -72,9 +72,7 @@ function SceneLights() {
 
   return (
     <>
-      {ambient.enabled && (
-        <ambientLight color={ambient.color} intensity={ambient.intensity} />
-      )}
+      {ambient.enabled    && <ambientLight color={ambient.color} intensity={ambient.intensity} />}
       {directional.enabled && <DirectionalWithHelper light={directional} />}
       {point.enabled       && <PointWithHelper       light={point}       />}
       {spot.enabled        && <SpotWithHelper        light={spot}        />}

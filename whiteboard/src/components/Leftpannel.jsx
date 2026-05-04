@@ -20,7 +20,6 @@ function LeftPanel() {
   return (
     <div className="flex-[0_0_180px] border-r border-gray-200 p-3 overflow-y-auto overflow-x-hidden flex flex-col gap-4">
 
-      {/* ── Scene ──────────────────────────────── */}
       <Section title="Scene">
         <div className="flex items-center gap-2">
           <input
@@ -34,7 +33,6 @@ function LeftPanel() {
         </div>
       </Section>
 
-      {/* ── Transform ──────────────────────────── */}
       <Section title="Transform">
         <Toggle
           label={`Gizmo ${showTransform ? 'On' : 'Off'}`}
@@ -63,7 +61,6 @@ function LeftPanel() {
         </div>
       </Section>
 
-      {/* ── Geometries ─────────────────────────── */}
       <Section title="Geometries">
         <p className="text-[9px] text-gray-400">Click to add to scene</p>
         <div className="grid grid-cols-3 gap-1.5 w-full">
@@ -83,7 +80,6 @@ function LeftPanel() {
         </div>
       </Section>
 
-      {/* ── Objects in Scene ───────────────────── */}
       {objects.length > 0 && (
         <Section title="Objects">
           <div className="flex flex-col gap-1">
@@ -92,14 +88,14 @@ function LeftPanel() {
               return (
                 <div
                   key={obj.id}
+                  onClick={() => selectObject(obj.id)}
                   className={`flex items-center justify-between px-2 py-1.5 rounded cursor-pointer text-xs font-medium transition-colors
                     ${isSelected ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                  onClick={() => selectObject(obj.id)}
                 >
-                  <span className="capitalize truncate">{geometries[obj.geometryKey]?.name} #{obj.id}</span>
+                  <span className="truncate">{obj.name}</span>
                   <button
                     onClick={(e) => { e.stopPropagation(); removeObject(obj.id) }}
-                    className={`ml-1 text-[10px] font-bold transition-colors
+                    className={`ml-1 text-[10px] font-bold transition-colors flex-shrink-0
                       ${isSelected ? 'text-white hover:text-red-200' : 'text-gray-400 hover:text-red-500'}`}
                   >
                     ✕

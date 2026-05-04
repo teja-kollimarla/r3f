@@ -1,27 +1,42 @@
-import { useRef, useState, useMemo } from 'react'
+import { useRef, useState, useMemo, useEffect } from 'react'
 import { TransformControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { geometries } from '../lib/geometrics'
 import useStore from '../store/useStore'
 
 function SceneObject({ obj }) {
-  const meshRef   = useRef()
+  const meshRef = useRef()
+  const matRef  = useRef()
   const [ready, setReady] = useState(false)
 
-  const selectedId     = useStore((s) => s.selectedId)
-  const selectObject   = useStore((s) => s.selectObject)
-  const transformMode  = useStore((s) => s.transformMode)
-  const showTransform  = useStore((s) => s.showTransform)
+  const selectedId    = useStore((s) => s.selectedId)
+  const selectObject  = useStore((s) => s.selectObject)
+  const transformMode = useStore((s) => s.transformMode)
+  const showTransform = useStore((s) => s.showTransform)
 
   const { id, geometryKey, geoArgs, objectProps } = obj
-  const { color, scale, wireframe, rotation } = objectProps
+  const { color, scale, wireframe, opacity, rotation } = objectProps
   const isSelected = selectedId === id
 
   const item = geometries[geometryKey]
+
   const geometry = useMemo(() => {
     if (!item) return null
     return new item.geometry(...geoArgs)
   }, [geometryKey, geoArgs])
+
+  useEffect(() => {
+    if (!matRef.current) return
+    matRef.current.transparent = opacity < 1
+    matRef.current.opacity     = opacity
+    matRef.current.depthWrite  = opacity >= 1
+    matRef.current.needsUpdate = true
+  }, [opacity])
+
+  useEffect(() => {
+    if (!matRef.current) return
+    matRef.current.color.set(color)
+  }, [color])
 
   useFrame((_, delta) => {
     if (!meshRef.current || !rotation.enabled) return
@@ -34,13 +49,8 @@ function SceneObject({ obj }) {
 
   return (
     <>
-      {ready && isSelected && (
-        <TransformControls
-          enabled={showTransform}
-          visible={showTransform}
-          object={meshRef}
-          mode={transformMode}
-        />
+      {ready && isSelected && showTransform && (
+        <TransformControls object={meshRef} mode={transformMode} />
       )}
       <mesh
         ref={(el) => {
@@ -51,23 +61,26 @@ function SceneObject({ obj }) {
         onClick={(e) => { e.stopPropagation(); selectObject(id) }}
       >
         <primitive object={geometry} attach="geometry" />
-        <meshStandardMaterial
-          color={color}
-          wireframe={wireframe}
-          emissive={isSelected ? '#222222' : '#000000'}
-        />
+        {wireframe
+          ? <meshBasicMaterial key="wireframe" color={color} wireframe />
+          : <meshStandardMaterial
+              key="standard"
+              ref={matRef}
+              color={color}
+              emissive={isSelected ? '#222222' : '#000000'}
+            />
+        }
       </mesh>
     </>
   )
 }
 
 function Scene() {
-  const objects = useStore((s) => s.objects)
+  const objects      = useStore((s) => s.objects)
   const selectObject = useStore((s) => s.selectObject)
 
   return (
     <>
-      {/* Click on empty space to deselect */}
       <mesh
         scale={[1000, 1000, 1000]}
         onClick={() => selectObject(null)}

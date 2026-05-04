@@ -13,7 +13,7 @@ function SceneBackground() {
 }
 
 function App() {
-  const objects   = useStore((s) => s.objects)
+  const objects    = useStore((s) => s.objects)
   const selectedId = useStore((s) => s.selectedId)
 
   return (
@@ -40,6 +40,7 @@ function App() {
         </div>
 
         {selectedId && <RightPanel />}
+
       </div>
     </div>
   )

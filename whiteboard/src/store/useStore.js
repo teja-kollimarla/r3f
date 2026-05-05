@@ -89,7 +89,9 @@ const useStore = create((set) => ({
 
   backgroundColor:    '#d1d5db',
   setBackgroundColor: (color) => set({ backgroundColor: color }),
-
+  
+  isDraggingLabel: false,
+setIsDraggingLabel: (v) => set({ isDraggingLabel: v }),
   labels: [],
   selectedLabelId: null,
 

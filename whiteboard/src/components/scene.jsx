@@ -77,6 +77,7 @@ function SceneObject({ obj }) {
           ref={(el) => {
             meshRef.current = el
             if (el) {
+              el.userData.labelTargetId = id   
               el.rotation.set(totalRotX, totalRotY, totalRotZ)
               if (!ready) setReady(true)
             }

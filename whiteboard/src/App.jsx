@@ -14,8 +14,9 @@ function SceneBackground() {
 }
 
 function App() {
-  const objects    = useStore((s) => s.objects)
-  const selectedId = useStore((s) => s.selectedId)
+  const objects           = useStore((s) => s.objects)
+  const selectedId        = useStore((s) => s.selectedId)
+  const isDraggingLabel   = useStore((s) => s.isDraggingLabel)
 
   return (
     <div className="w-full h-screen bg-gray-300 flex items-center justify-center">
@@ -25,7 +26,7 @@ function App() {
           <Canvas camera={{ position: [5, 3, 5], fov: 45, near: 0.1, far: 10000 }}>
             <SceneBackground />
             <SceneLights />
-            <OrbitControls makeDefault />
+            <OrbitControls makeDefault enabled={!isDraggingLabel} />
             <axesHelper args={[5]} />
             <gridHelper args={[20, 20, 'red', 'blue']} />
             <Scene />

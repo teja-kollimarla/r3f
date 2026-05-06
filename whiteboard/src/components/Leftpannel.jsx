@@ -4,6 +4,7 @@ import { geometries } from '../lib/geometrics'
 import Section from './ui/selection'
 import LightingPanel from './LightingPannel'
 import Toggle from './ui/toggle'
+import { FaCamera } from 'react-icons/fa'
 
 function LabelsPanel() {
   const objects         = useStore((s) => s.objects)
@@ -116,10 +117,15 @@ function LabelsPanel() {
 
 function LeftPanel() {
   const objects            = useStore((s) => s.objects)
+  const cameras            = useStore((s) => s.cameras)
   const selectedId         = useStore((s) => s.selectedId)
+  const selectedCameraId   = useStore((s) => s.selectedCameraId)
   const addObject          = useStore((s) => s.addObject)
+  const addCamera          = useStore((s) => s.addCamera)
   const removeObject       = useStore((s) => s.removeObject)
+  const removeCamera       = useStore((s) => s.removeCamera)
   const selectObject       = useStore((s) => s.selectObject)
+  const selectCamera       = useStore((s) => s.selectCamera)
   const transformMode      = useStore((s) => s.transformMode)
   const showTransform      = useStore((s) => s.showTransform)
   const setTransformMode   = useStore((s) => s.setTransformMode)
@@ -187,6 +193,13 @@ function LeftPanel() {
               </div>
             )
           })}
+          <div
+            onClick={() => addCamera()}
+            className="flex flex-col items-center justify-start gap-1 p-1.5 rounded cursor-pointer transition-colors bg-gray-100 text-gray-700 hover:bg-purple-100 hover:text-purple-600 active:scale-95"
+          >
+            <div className="icon-wrapper"><FaCamera /></div>
+            <span className="text-[9px] text-center w-full truncate leading-tight">Camera</span>
+          </div>
         </div>
       </Section>
 
@@ -205,6 +218,32 @@ function LeftPanel() {
                   <span className="capitalize truncate">{obj.name}</span>
                   <button
                     onClick={(e) => { e.stopPropagation(); removeObject(obj.id) }}
+                    className="ml-1 w-4 h-4 flex items-center justify-center rounded-full text-[9px] font-bold transition-colors bg-white/20 hover:bg-red-500 text-white"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </Section>
+      )}
+
+      {cameras.length > 0 && (
+        <Section title="Cameras">
+          <div className="flex flex-col gap-1">
+            {cameras.map((cam) => {
+              const isSelected = cam.id === selectedCameraId
+              return (
+                <div
+                  key={cam.id}
+                  className={`flex items-center justify-between px-2 py-1.5 rounded cursor-pointer text-xs font-medium transition-colors
+                    ${isSelected ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                  onClick={() => selectCamera(cam.id)}
+                >
+                  <span className="truncate">{cam.name}</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); removeCamera(cam.id) }}
                     className="ml-1 w-4 h-4 flex items-center justify-center rounded-full text-[9px] font-bold transition-colors bg-white/20 hover:bg-red-500 text-white"
                   >
                     ✕

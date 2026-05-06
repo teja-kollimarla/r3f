@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from 'react'
+import { useRef, useState, useMemo, useEffect } from 'react'  // add useEffect
 import * as THREE from 'three'
 import { TransformControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
@@ -6,19 +6,25 @@ import { geometries } from '../lib/geometrics'
 import { geoConfigs } from '../lib/geoConfigs'
 import OrbitPath from '../lib/oribitpath'
 import useStore from '../store/useStore'
+import CameraObject from './CameraObject'
+import objectPositions from '../lib/objectPositions'
 
 const DEG = Math.PI / 180
+const RAD = 180 / Math.PI
 
 function SceneObject({ obj }) {
-  const meshRef  = useRef()
-  const groupRef = useRef()
-  const angleRef = useRef(0)
+  const meshRef      = useRef()
+  const groupRef     = useRef()
+  const transformRef = useRef()   // ← ref for TransformControls
+  const angleRef     = useRef(0)
   const [ready, setReady] = useState(false)
 
-  const selectedId    = useStore((s) => s.selectedId)
-  const selectObject  = useStore((s) => s.selectObject)
-  const transformMode = useStore((s) => s.transformMode)
-  const showTransform = useStore((s) => s.showTransform)
+  const selectedId        = useStore((s) => s.selectedId)
+  const selectObject      = useStore((s) => s.selectObject)
+  const transformMode     = useStore((s) => s.transformMode)
+  const showTransform     = useStore((s) => s.showTransform)
+  const setIsTransforming = useStore((s) => s.setIsTransforming)
+  const setObjectProp     = useStore((s) => s.setObjectProp)
 
   const { id, geometryKey, geoArgs, objectProps } = obj
   const { color, scale, wireframe, opacity, doubleSide, meshRotation, rotation, revolve } = objectProps
@@ -39,7 +45,37 @@ function SceneObject({ obj }) {
 
   const side = doubleSide ? THREE.DoubleSide : THREE.FrontSide
 
+  // ── Wire up dragging-changed on the THREE.js level ───────────────────────
+  useEffect(() => {
+    const tc = transformRef.current
+    if (!tc) return
+    const onDragChange = (e) => setIsTransforming(e.value)
+    tc.addEventListener('dragging-changed', onDragChange)
+    return () => {
+      tc.removeEventListener('dragging-changed', onDragChange)
+      setIsTransforming(false)  // cleanup on unmount
+    }
+  }, [ready, isSelected, showTransform])
+
+  // ── Sync rotate back to store ─────────────────────────────────────────────
+  const handleObjectChange = () => {
+    if (!meshRef.current || transformMode !== 'rotate') return
+    const r = meshRef.current.rotation
+    setObjectProp(id, 'meshRotation', {
+      x: (r.x - defaultMeshRot[0]) * RAD,
+      y: (r.y - defaultMeshRot[1]) * RAD,
+      z: (r.z - defaultMeshRot[2]) * RAD,
+    })
+  }
+
   useFrame((_, delta) => {
+    // Publish world position so cameras can track this object
+    if (meshRef.current) {
+      const wp = new THREE.Vector3()
+      meshRef.current.getWorldPosition(wp)
+      objectPositions.set(id, wp)
+    }
+
     if (meshRef.current && !rotation.enabled) {
       meshRef.current.rotation.set(totalRotX, totalRotY, totalRotZ)
     }
@@ -70,14 +106,20 @@ function SceneObject({ obj }) {
 
       <group ref={groupRef}>
         {ready && isSelected && showTransform && (
-          <TransformControls object={meshRef} mode={transformMode} />
+          <TransformControls
+            ref={transformRef}        // ← attach ref
+            object={meshRef}
+            mode={transformMode}
+            onChange={handleObjectChange}
+            // Remove onMouseDown/onMouseUp — dragging-changed handles it
+          />
         )}
 
         <mesh
           ref={(el) => {
             meshRef.current = el
             if (el) {
-              el.userData.labelTargetId = id   
+              el.userData.labelTargetId = id
               el.rotation.set(totalRotX, totalRotY, totalRotZ)
               if (!ready) setReady(true)
             }
@@ -87,21 +129,9 @@ function SceneObject({ obj }) {
         >
           <primitive object={geometry} attach="geometry" />
           {wireframe ? (
-            <meshStandardMaterial
-              color={color}
-              wireframe
-              side={side}
-              transparent={opacity < 1}
-              opacity={opacity}
-            />
+            <meshStandardMaterial color={color} wireframe side={side} transparent={opacity < 1} opacity={opacity} />
           ) : (
-            <meshStandardMaterial
-              color={color}
-              side={side}
-              transparent={opacity < 1}
-              opacity={opacity}
-              emissive={isSelected ? '#222222' : '#000000'}
-            />
+            <meshStandardMaterial color={color} side={side} transparent={opacity < 1} opacity={opacity} emissive={isSelected ? '#222222' : '#000000'} />
           )}
         </mesh>
       </group>
@@ -111,15 +141,20 @@ function SceneObject({ obj }) {
 
 function Scene() {
   const objects      = useStore((s) => s.objects)
+  const cameras      = useStore((s) => s.cameras)
   const selectObject = useStore((s) => s.selectObject)
+  const selectCamera = useStore((s) => s.selectCamera)
 
   return (
     <>
-      <mesh scale={[1000, 1000, 1000]} onClick={() => selectObject(null)} visible={false}>
+      <mesh scale={[1000, 1000, 1000]} onClick={() => { selectObject(null); selectCamera(null) }} visible={false}>
         <planeGeometry />
       </mesh>
       {objects.map((obj) => (
         <SceneObject key={obj.id} obj={obj} />
+      ))}
+      {cameras.map((cam) => (
+        <CameraObject key={cam.id} camera={cam} />
       ))}
     </>
   )

@@ -1,4 +1,4 @@
-import { OrbitControls } from '@react-three/drei'
+import { GizmoHelper, GizmoViewport, OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import './App.css'
 import useStore from './store/useStore'
@@ -7,6 +7,7 @@ import RightPanel from './components/RightPannel'
 import SceneLights from './components/SceneLighting'
 import SceneLabels from './components/SceneLabels'
 import Scene from './components/Scene'
+import PreviewCamera from './components/PreviewCamera'
 
 function SceneBackground() {
   const backgroundColor = useStore((s) => s.backgroundColor)
@@ -15,8 +16,14 @@ function SceneBackground() {
 
 function App() {
   const objects           = useStore((s) => s.objects)
+  const cameras           = useStore((s) => s.cameras)
   const selectedId        = useStore((s) => s.selectedId)
+  const selectedCameraId  = useStore((s) => s.selectedCameraId)
+  const previewCameraId   = useStore((s) => s.previewCameraId)
   const isDraggingLabel   = useStore((s) => s.isDraggingLabel)
+  const isTransforming = useStore((s) => s.isTransforming)
+
+  const showRightPanel = selectedId || selectedCameraId
 
   return (
     <div className="w-full h-screen bg-gray-300 flex items-center justify-center">
@@ -26,19 +33,27 @@ function App() {
           <Canvas camera={{ position: [5, 3, 5], fov: 45, near: 0.1, far: 10000 }}>
             <SceneBackground />
             <SceneLights />
-            <OrbitControls makeDefault enabled={!isDraggingLabel} />
-            <axesHelper args={[5]} />
-            <gridHelper args={[20, 20, 'red', 'blue']} />
+            {previewCameraId ? (
+              <>
+                <PreviewCamera />
+                <OrbitControls enabled={false} />
+              </>
+            ) : (
+              <OrbitControls makeDefault enablePan={true} enabled={!isDraggingLabel && !isTransforming} maxDistance={150} minDistance={1}/>
+            )}
+            <axesHelper args={[50]} />
+            <gridHelper args={[100, 100, 'red', 'blue']} />
+            <GizmoHelper alignment="top-right" margin={[80, 80]}><GizmoViewport /></GizmoHelper>
             <Scene />
             <SceneLabels />
           </Canvas>
-          {objects.length === 0 && (
+          {objects.length === 0 && cameras.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <p className="text-gray-400 text-sm">Add a geometry from the panel</p>
+              <p className="text-gray-400 text-sm">Add a geometry or camera from the panel</p>
             </div>
           )}
         </div>
-        {selectedId && <RightPanel />}
+        {showRightPanel && <RightPanel />}
       </div>
     </div>
   )

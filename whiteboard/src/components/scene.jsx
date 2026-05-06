@@ -7,6 +7,8 @@ import { geoConfigs } from '../lib/geoConfigs'
 import OrbitPath from '../lib/oribitpath'
 import useStore from '../store/useStore'
 import CameraObject from './CameraObject'
+import HotspotObject from './HotspotObject'
+import HotspotPathMarkers from './HotspotPathMarkers'
 import objectPositions from '../lib/objectPositions'
 
 const DEG = Math.PI / 180
@@ -140,14 +142,20 @@ function SceneObject({ obj }) {
 }
 
 function Scene() {
-  const objects      = useStore((s) => s.objects)
-  const cameras      = useStore((s) => s.cameras)
-  const selectObject = useStore((s) => s.selectObject)
-  const selectCamera = useStore((s) => s.selectCamera)
+  const objects         = useStore((s) => s.objects)
+  const cameras         = useStore((s) => s.cameras)
+  const hotspots        = useStore((s) => s.hotspots)
+  const selectObject    = useStore((s) => s.selectObject)
+  const selectCamera    = useStore((s) => s.selectCamera)
+  const selectHotspot   = useStore((s) => s.selectHotspot)
 
   return (
     <>
-      <mesh scale={[1000, 1000, 1000]} onClick={() => { selectObject(null); selectCamera(null) }} visible={false}>
+      <mesh
+        scale={[1000, 1000, 1000]}
+        onClick={() => { selectObject(null); selectCamera(null); selectHotspot(null) }}
+        visible={false}
+      >
         <planeGeometry />
       </mesh>
       {objects.map((obj) => (
@@ -156,6 +164,10 @@ function Scene() {
       {cameras.map((cam) => (
         <CameraObject key={cam.id} camera={cam} />
       ))}
+      {hotspots.map((hs) => (
+        <HotspotObject key={hs.id} hotspot={hs} />
+      ))}
+      <HotspotPathMarkers />
     </>
   )
 }

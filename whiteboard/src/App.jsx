@@ -8,6 +8,7 @@ import SceneLights from './components/SceneLighting'
 import SceneLabels from './components/SceneLabels'
 import Scene from './components/Scene'
 import PreviewCamera from './components/PreviewCamera'
+import CameraAnimator from './components/CameraAnimator'
 
 function SceneBackground() {
   const backgroundColor = useStore((s) => s.backgroundColor)
@@ -21,9 +22,11 @@ function App() {
   const selectedCameraId  = useStore((s) => s.selectedCameraId)
   const previewCameraId   = useStore((s) => s.previewCameraId)
   const isDraggingLabel   = useStore((s) => s.isDraggingLabel)
-  const isTransforming = useStore((s) => s.isTransforming)
+  const isTransforming    = useStore((s) => s.isTransforming)
+  const isAnimating       = useStore((s) => s.isAnimating)
+  const selectedHotspotId = useStore((s) => s.selectedHotspotId)
 
-  const showRightPanel = selectedId || selectedCameraId
+  const showRightPanel = selectedId || selectedCameraId || selectedHotspotId
 
   return (
     <div className="w-full h-screen bg-gray-300 flex items-center justify-center">
@@ -33,13 +36,17 @@ function App() {
           <Canvas camera={{ position: [5, 3, 5], fov: 45, near: 0.1, far: 10000 }}>
             <SceneBackground />
             <SceneLights />
+            <CameraAnimator />
             {previewCameraId ? (
               <>
                 <PreviewCamera />
                 <OrbitControls enabled={false} />
               </>
             ) : (
-              <OrbitControls makeDefault enablePan={true} enabled={!isDraggingLabel && !isTransforming} maxDistance={150} minDistance={1}/>
+              <OrbitControls makeDefault enablePan={true}
+                enabled={!isDraggingLabel && !isTransforming && !isAnimating}
+                maxDistance={150} minDistance={1}
+              />
             )}
             <axesHelper args={[50]} />
             <gridHelper args={[100, 100, 'red', 'blue']} />

@@ -118,14 +118,21 @@ function LabelsPanel() {
 function LeftPanel() {
   const objects            = useStore((s) => s.objects)
   const cameras            = useStore((s) => s.cameras)
+  const hotspots           = useStore((s) => s.hotspots)
   const selectedId         = useStore((s) => s.selectedId)
   const selectedCameraId   = useStore((s) => s.selectedCameraId)
+  const selectedHotspotId  = useStore((s) => s.selectedHotspotId)
+  const isAnimating        = useStore((s) => s.isAnimating)
   const addObject          = useStore((s) => s.addObject)
   const addCamera          = useStore((s) => s.addCamera)
+  const addHotspot         = useStore((s) => s.addHotspot)
   const removeObject       = useStore((s) => s.removeObject)
   const removeCamera       = useStore((s) => s.removeCamera)
+  const removeHotspot      = useStore((s) => s.removeHotspot)
   const selectObject       = useStore((s) => s.selectObject)
   const selectCamera       = useStore((s) => s.selectCamera)
+  const selectHotspot      = useStore((s) => s.selectHotspot)
+  const triggerHotspot     = useStore((s) => s.triggerHotspot)
   const transformMode      = useStore((s) => s.transformMode)
   const showTransform      = useStore((s) => s.showTransform)
   const setTransformMode   = useStore((s) => s.setTransformMode)
@@ -256,6 +263,52 @@ function LeftPanel() {
       )}
 
       <LabelsPanel />
+
+      {/* ── Hotspots ── */}
+      <Section title="Hotspots">
+        <button
+          onClick={addHotspot}
+          className="text-[10px] bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded font-medium transition-colors w-full"
+        >
+          + Add Hotspot
+        </button>
+        {hotspots.length > 0 && (
+          <div className="flex flex-col gap-1 mt-1">
+            {hotspots.map((hs) => {
+              const isSelected = hs.id === selectedHotspotId
+              return (
+                <div
+                  key={hs.id}
+                  className={`flex items-center justify-between px-2 py-1.5 rounded cursor-pointer text-xs font-medium transition-colors
+                    ${isSelected ? 'text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                  style={isSelected ? { backgroundColor: hs.color } : {}}
+                  onClick={() => selectHotspot(hs.id)}
+                >
+                  <span className="truncate flex items-center gap-1">
+                    <span>●</span>
+                    <span>{hs.name}</span>
+                  </span>
+                  <div className="flex items-center gap-1 ml-1 flex-shrink-0">
+                    <button
+                      title="Play"
+                      onClick={(e) => { e.stopPropagation(); if (!isAnimating) triggerHotspot(hs.id) }}
+                      className="w-4 h-4 flex items-center justify-center rounded text-[9px] bg-white/30 hover:bg-white/60"
+                    >
+                      ▶
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); removeHotspot(hs.id) }}
+                      className="w-4 h-4 flex items-center justify-center rounded-full text-[9px] font-bold bg-white/20 hover:bg-red-500 text-white"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </Section>
 
       <LightingPanel />
 

@@ -35,8 +35,44 @@ const defaultLights = {
 const typeCounts = {}
 let nextId = 1
 let nextLabelId = 1
-
 let nextCameraId = 1
+let nextHotspotId = 1
+
+const makeHotspot = (id) => ({
+  id,
+  name: `Hotspot ${id}`,
+  position: [0, 1, 0],
+  color: '#f59e0b',
+  action: {
+    type: 'move-to',
+    // move-to / zoom-out
+    toPosition: [5, 3, 5],
+    toLookAt:   [0, 0, 0],
+    toFov:      45,
+    // zoom-in
+    zoomTarget:   [0, 0, 0],
+    zoomDistance: 3,
+    zoomFov:      30,
+    // focus-object
+    focusObjectId: null,
+    focusDistance: 5,
+    focusFov:      45,
+    // orbit
+    orbitTarget: [0, 0, 0],
+    orbitRadius: 5,
+    orbitAngle:  360,
+    orbitHeight: 0,
+    // sequence
+    sequenceIds: [],
+    // start / path
+    useDefinedStart: false,
+    startPosition:   [0, 3, 5],
+    startLookAt:     [0, 0, 0],
+    startFov:        45,
+    waypoints:       [],
+  },
+  transition: { duration: 1.5, easing: 'ease-in-out', delay: 0, loopBack: false, loopBackDuration: 1.5 },
+})
 
 const useStore = create((set) => ({
   objects: [],
@@ -187,6 +223,80 @@ const useStore = create((set) => ({
 
   startPreview: (id) => set({ previewCameraId: id }),
   stopPreview: () => set({ previewCameraId: null }),
+
+  // ── Hotspots ────────────────────────────────────────────────────────────────
+  hotspots: [],
+  selectedHotspotId: null,
+  pendingHotspotId:  null,
+  isAnimating:       false,
+
+  addHotspot: () => {
+    const id = nextHotspotId++
+    set((state) => ({
+      hotspots: [...state.hotspots, makeHotspot(id)],
+      selectedHotspotId: id,
+      selectedId: null,
+      selectedCameraId: null,
+    }))
+  },
+
+  removeHotspot: (id) => set((state) => ({
+    hotspots: state.hotspots.filter((h) => h.id !== id),
+    selectedHotspotId: state.selectedHotspotId === id ? null : state.selectedHotspotId,
+    pendingHotspotId:  state.pendingHotspotId  === id ? null : state.pendingHotspotId,
+  })),
+
+  updateHotspot: (id, key, value) => set((state) => ({
+    hotspots: state.hotspots.map((h) => h.id === id ? { ...h, [key]: value } : h),
+  })),
+
+  updateHotspotAction: (id, key, value) => set((state) => ({
+    hotspots: state.hotspots.map((h) =>
+      h.id === id ? { ...h, action: { ...h.action, [key]: value } } : h
+    ),
+  })),
+
+  updateHotspotTransition: (id, key, value) => set((state) => ({
+    hotspots: state.hotspots.map((h) =>
+      h.id === id ? { ...h, transition: { ...h.transition, [key]: value } } : h
+    ),
+  })),
+
+  selectHotspot:       (id) => set({ selectedHotspotId: id, selectedId: null, selectedCameraId: null }),
+  triggerHotspot:      (id) => set({ pendingHotspotId: id }),
+  clearPendingHotspot: ()   => set({ pendingHotspotId: null }),
+  setIsAnimating:      (v)  => set({ isAnimating: v }),
+
+  captureRequest: null,
+  requestCaptureCamera: (hid, field, waypointIndex = null) =>
+    set({ captureRequest: { hid, field, waypointIndex } }),
+  clearCaptureRequest: () => set({ captureRequest: null }),
+
+  addHotspotWaypoint: (hid) => set((state) => ({
+    hotspots: state.hotspots.map((h) =>
+      h.id === hid
+        ? { ...h, action: { ...h.action, waypoints: [...(h.action.waypoints ?? []), { position: [5, 3, 5], lookAt: [0, 0, 0], fov: 45 }] } }
+        : h
+    ),
+  })),
+
+  removeHotspotWaypoint: (hid, index) => set((state) => ({
+    hotspots: state.hotspots.map((h) =>
+      h.id === hid
+        ? { ...h, action: { ...h.action, waypoints: (h.action.waypoints ?? []).filter((_, i) => i !== index) } }
+        : h
+    ),
+  })),
+
+  updateHotspotWaypoint: (hid, index, key, value) => set((state) => ({
+    hotspots: state.hotspots.map((h) => {
+      if (h.id !== hid) return h
+      const waypoints = (h.action.waypoints ?? []).map((wp, i) =>
+        i === index ? { ...wp, [key]: value } : wp
+      )
+      return { ...h, action: { ...h.action, waypoints } }
+    }),
+  })),
 }))
 
 export default useStore

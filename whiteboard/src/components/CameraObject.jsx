@@ -131,7 +131,6 @@ function CameraObject({ camera }) {
       }
     }
 
-    // ── 2. Update orientation AFTER position is settled ───────────────────
     if (sphere) {
       lookAtSafe(helperCam.current, sphere.center)
       if (autoFrame) {
@@ -149,7 +148,6 @@ function CameraObject({ camera }) {
       helperCam.current.up.set(0, 1, 0)
     }
 
-    // ── 3. Refresh helper wireframe ───────────────────────────────────────
     if (helperRef.current) {
       helperCam.current.updateMatrixWorld(true)
       helperRef.current.update()
